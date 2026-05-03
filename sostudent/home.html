@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SOStudent</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    #main { flex: 1; }
+    .table td { vertical-align: middle; }
+    #search { max-width: 300px; }
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="home.html">SOStudent</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navContent">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
+      <li class="nav-item" id="nav-profile" style="display:none;"><a class="nav-link" href="profile.html">Profile</a></li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0 mr-2">
+      <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search questions" aria-label="Search">
+    </form>
+  </div>
+  <a class="mx-4" href="login.html" id="nav-login">Login</a>
+  <a class="mx-4" href="#" id="nav-logout" onclick="SOStudent.auth.logout(); return false;" style="display:none;">Logout</a>
+</nav>
+
+<div class="container mt-3">
+  <div class="alert alert-info alert-dismissible fade show" role="alert">
+    <strong>Demo mode</strong> — running in your browser with simulated data. All changes are saved locally in this browser.
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+  </div>
+</div>
+
+<div class="container" id="main">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Welcome, <span id="welcome-name"></span></h2>
+    <a href="post-question.html" class="btn btn-primary">Post Question</a>
+  </div>
+
+  <table class="table table-hover" id="questions-table">
+    <thead class="thead-light">
+      <tr>
+        <th>Username</th>
+        <th>Subject</th>
+        <th>Question</th>
+        <th>Favourites</th>
+        <th>Link</th>
+      </tr>
+    </thead>
+    <tbody id="questions-body"></tbody>
+  </table>
+  <p id="no-results" class="text-muted" style="display:none;">No questions match your search.</p>
+</div>
+
+<footer id="footer" class="bg-light mt-4">
+  <div class="container"><p>&copy; 2023 SOStudent</p></div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!SOStudent.auth.requireLogin()) throw '';
+  SOStudent.renderNav();
+
+  const cu = SOStudent.auth.currentUser();
+  document.getElementById('welcome-name').textContent = cu.username;
+
+  function renderQuestions(filter) {
+    const qs = SOStudent.questions.all();
+    const body = document.getElementById('questions-body');
+    const noResults = document.getElementById('no-results');
+    const filtered = filter
+      ? qs.filter(q => q.question.toLowerCase().includes(filter) || q.subject.toLowerCase().includes(filter) || q.username.toLowerCase().includes(filter))
+      : qs;
+
+    if (filtered.length === 0) {
+      body.innerHTML = '';
+      noResults.style.display = '';
+      return;
+    }
+    noResults.style.display = 'none';
+    body.innerHTML = filtered.map(q => `
+      <tr>
+        <td>${escHtml(q.username)}</td>
+        <td><span class="badge badge-secondary">${escHtml(q.subject)}</span></td>
+        <td>${escHtml(q.question)}</td>
+        <td>${q.rating}</td>
+        <td><a href="question.html?id=${q.id}">link</a></td>
+      </tr>
+    `).join('');
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  renderQuestions();
+
+  document.getElementById('search').addEventListener('input', function() {
+    renderQuestions(this.value.trim().toLowerCase());
+  });
+</script>
+</body>
+</html>
