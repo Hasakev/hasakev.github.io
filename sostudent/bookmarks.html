@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SOStudent — Bookmarks</title>
+  <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+  <style>
+    #main { height: 100%; }
+    footer { position: relative; left: 0; right: 0; margin-top: auto; }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    #main { flex: 1; }
+    .table td { vertical-align: middle; }
+  </style>
+</head>
+<body>
+<div id="navbar-placeholder"></div>
+
+<div class="container" id="main">
+  <h2 class="mt-3">My Bookmarks</h2>
+  <div id="bookmark-content"></div>
+</div>
+
+<div id="footer-placeholder"></div>
+
+<script src="assets/js/jquery-3.6.0.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+  if (!SOStudent.initPage(true)) throw '';
+
+  function escHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  const bookmarked = SOStudent.bookmarks.forUser();
+  if (bookmarked.length === 0) {
+    $('#bookmark-content').html('<p class="text-muted mt-3">You have no bookmarked questions yet. Browse questions and click 🔖 Bookmark to save them here.</p>');
+  } else {
+    $('#bookmark-content').html(`
+      <table class="table mt-3">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Subject</th>
+            <th>Question</th>
+            <th>Favourites</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${bookmarked.map(q => `
+            <tr>
+              <td>${escHtml(q.username)}</td>
+              <td>${escHtml(q.subject)}</td>
+              <td>${escHtml(q.question)}</td>
+              <td>${q.rating}</td>
+              <td><a href="question.html?id=${q.id}">link</a></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`);
+  }
+</script>
+</body>
+</html>

@@ -2,48 +2,38 @@
 <html>
 <head>
   <title>SOStudent</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
   <style>
+    #main { height: 100%; }
+    footer { position: relative; left: 0; right: 0; margin-top: auto; }
     body { display: flex; flex-direction: column; min-height: 100vh; }
     #main { flex: 1; }
     .table td { vertical-align: middle; }
-    #search { max-width: 300px; }
+    .rec-card { border-left: 3px solid #007bff; }
+    .ui-autocomplete { z-index: 9999 !important; }
+    /* keep autocomplete input wide enough */
+    #nav-search { min-width: 180px; }
   </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="home.html">SOStudent</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navContent">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item"><a class="nav-link" href="home.html">Home</a></li>
-      <li class="nav-item" id="nav-profile" style="display:none;"><a class="nav-link" href="profile.html">Profile</a></li>
-    </ul>
-    <form class="form-inline my-2 my-lg-0 mr-2">
-      <input id="search" class="form-control mr-sm-2" type="search" placeholder="Search questions" aria-label="Search">
-    </form>
-  </div>
-  <a class="mx-4" href="login.html" id="nav-login">Login</a>
-  <a class="mx-4" href="#" id="nav-logout" onclick="SOStudent.auth.logout(); return false;" style="display:none;">Logout</a>
-</nav>
+<div id="navbar-placeholder"></div>
 
 <div class="container mt-3">
   <div class="alert alert-info alert-dismissible fade show" role="alert">
-    <strong>Demo mode</strong> — running in your browser with simulated data. All changes are saved locally in this browser.
+    <strong>Demo mode</strong> — all data is stored locally in this browser. Search has jQuery UI autocomplete. Recommendations appear after viewing questions.
     <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
   </div>
 </div>
 
 <div class="container" id="main">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3 mt-2">
     <h2>Welcome, <span id="welcome-name"></span></h2>
     <a href="post-question.html" class="btn btn-primary">Post Question</a>
   </div>
 
-  <table class="table table-hover" id="questions-table">
-    <thead class="thead-light">
+  <table class="table" id="questions-table">
+    <thead>
       <tr>
         <th>Username</th>
         <th>Subject</th>
@@ -55,56 +45,93 @@
     <tbody id="questions-body"></tbody>
   </table>
   <p id="no-results" class="text-muted" style="display:none;">No questions match your search.</p>
+
+  <!-- Recommendation System -->
+  <div id="rec-section" style="display:none;" class="mt-4">
+    <h4>Recommended for you</h4>
+    <p class="text-muted small">Based on the topics you've been reading</p>
+    <div id="rec-cards" class="row"></div>
+  </div>
 </div>
 
-<footer id="footer" class="bg-light mt-4">
-  <div class="container"><p>&copy; 2023 SOStudent</p></div>
-</footer>
+<div id="footer-placeholder"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<script src="assets/js/bootstrap.bundle.min.js"></script>
 <script src="js/app.js"></script>
 <script>
-  if (!SOStudent.auth.requireLogin()) throw '';
-  SOStudent.renderNav();
+  if (!SOStudent.initPage(true)) throw '';
 
   const cu = SOStudent.auth.currentUser();
-  document.getElementById('welcome-name').textContent = cu.username;
+  $('#welcome-name').text(cu.username);
 
+  function escHtml(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── render questions table ───────────────────────────────────────────────
   function renderQuestions(filter) {
     const qs = SOStudent.questions.all();
-    const body = document.getElementById('questions-body');
-    const noResults = document.getElementById('no-results');
     const filtered = filter
-      ? qs.filter(q => q.question.toLowerCase().includes(filter) || q.subject.toLowerCase().includes(filter) || q.username.toLowerCase().includes(filter))
+      ? qs.filter(q =>
+          q.question.toLowerCase().includes(filter) ||
+          q.subject.toLowerCase().includes(filter) ||
+          q.username.toLowerCase().includes(filter))
       : qs;
-
+    const body = $('#questions-body');
     if (filtered.length === 0) {
-      body.innerHTML = '';
-      noResults.style.display = '';
+      body.html('');
+      $('#no-results').show();
       return;
     }
-    noResults.style.display = 'none';
-    body.innerHTML = filtered.map(q => `
+    $('#no-results').hide();
+    body.html(filtered.map(q => `
       <tr>
         <td>${escHtml(q.username)}</td>
-        <td><span class="badge badge-secondary">${escHtml(q.subject)}</span></td>
+        <td>${escHtml(q.subject)}</td>
         <td>${escHtml(q.question)}</td>
         <td>${q.rating}</td>
         <td><a href="question.html?id=${q.id}">link</a></td>
-      </tr>
-    `).join('');
-  }
-
-  function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      </tr>`).join(''));
   }
 
   renderQuestions();
 
-  document.getElementById('search').addEventListener('input', function() {
-    renderQuestions(this.value.trim().toLowerCase());
+  // ── jQuery UI autocomplete on navbar search ──────────────────────────────
+  const allQs = SOStudent.questions.all();
+  const autocompleteSource = allQs.map(q => ({
+    label: `[${q.subject}] ${q.question}`,
+    value: q.question,
+    id: q.id,
+  }));
+
+  $('#nav-search').autocomplete({
+    source: autocompleteSource,
+    minLength: 2,
+    select(event, ui) {
+      event.preventDefault();
+      window.location.href = `question.html?id=${ui.item.id}`;
+    },
+  }).on('input', function() {
+    renderQuestions($(this).val().trim().toLowerCase());
   });
+
+  // ── recommendation section ───────────────────────────────────────────────
+  const recs = SOStudent.recommendations.get();
+  if (recs.length > 0) {
+    $('#rec-section').show();
+    $('#rec-cards').html(recs.map(q => `
+      <div class="col-md-4 mb-3">
+        <div class="card rec-card h-100">
+          <div class="card-body">
+            <h6 class="card-subtitle mb-1 text-muted">${escHtml(q.subject)}</h6>
+            <p class="card-text">${escHtml(q.question)}</p>
+            <a href="question.html?id=${q.id}" class="btn btn-sm btn-outline-primary">View</a>
+          </div>
+        </div>
+      </div>`).join(''));
+  }
 </script>
 </body>
 </html>
