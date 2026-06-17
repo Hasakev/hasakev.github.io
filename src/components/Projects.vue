@@ -6,7 +6,6 @@ interface Project {
   tagColor: 'cyan' | 'magenta' | 'amber' | 'green'
   desc: string
   lang: string
-  langColor: string
   size: 'large' | 'small' | 'medium' | 'full'
 }
 
@@ -18,7 +17,6 @@ const projects: Project[] = [
     tagColor: 'cyan',
     desc: 'The website you\'re in right now! Fully vibe-coded in 15 minutes. Leveraged a mix of Claude and Codex for iterative design-driven development. AI is insane, we are so cooked. - Kev, 2026',
     lang: 'Vue.js · Vite · TypeScript · Python',
-    langColor: '#ff9900',
     size: 'small',
   },
   {
@@ -28,7 +26,6 @@ const projects: Project[] = [
     tagColor: 'magenta',
     desc: 'Large-scale spam email detection service deployed on AWS — Flask + SQLAlchemy API containerised with Docker, provisioned via Terraform (ECR, RDS, ECS). Async job processing with Celery + SNS; load tested and monitored via CloudWatch.',
     lang: 'Python · Flask · AWS · Terraform',
-    langColor: '#ff9900',
     size: 'small',
   },
   {
@@ -38,7 +35,6 @@ const projects: Project[] = [
     tagColor: 'green',
     desc: "Collaborative game built with 30 students using Java and LibGDX. Implemented core game components and diverse features. Managed via GitHub — branches, pull requests, issue tracking, and code reviews at scale.",
     lang: 'Java · LibGDX · SonarCloud',
-    langColor: '#b07219',
     size: 'medium',
   },
 ]
@@ -65,7 +61,7 @@ const projects: Project[] = [
         <div class="project-desc">{{ p.desc }}</div>
         <div class="project-meta">
           <div class="project-lang">
-            <div class="lang-dot" :style="{ background: p.langColor, boxShadow: `0 0 6px ${p.langColor}` }"></div>
+            <div class="lang-dot"></div>
             {{ p.lang }}
           </div>
           <span class="project-arrow">↗</span>
@@ -76,7 +72,7 @@ const projects: Project[] = [
 </template>
 
 <style scoped>
-#projects { padding-bottom: 80px; }
+#projects { padding-bottom: 48px; }
 
 .projects-grid {
   display: flex;
@@ -85,13 +81,12 @@ const projects: Project[] = [
 }
 
 .project-card {
-  background: linear-gradient(90deg, rgba(214,198,155,0.035), transparent 55%);
+  background: transparent;
   border: 0;
   border-bottom: 1px solid var(--border);
-  padding: 26px 0 28px 28px;
+  padding: 22px 0 24px 28px;
   position: relative;
   cursor: pointer;
-  transition: background 0.2s, padding-left 0.2s;
   text-decoration: none;
   color: inherit;
   display: grid;
@@ -106,14 +101,17 @@ const projects: Project[] = [
   left: 0;
   top: 22px;
   bottom: 22px;
-  width: 3px;
-  background: var(--amber);
-  opacity: 0.45;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s;
 }
 
-.project-card:hover {
-  background: linear-gradient(90deg, rgba(214,198,155,0.075), rgba(214,198,155,0.015) 58%, transparent);
-  padding-left: 34px;
+.project-card:hover::before { opacity: 1; }
+
+.project-card:hover .project-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .project-tag {
@@ -131,6 +129,11 @@ const projects: Project[] = [
   font-weight: 600;
   letter-spacing: -0.025em;
   color: var(--text);
+}
+
+.project-title::before {
+  content: '> ';
+  color: var(--accent);
 }
 
 .project-desc {
@@ -161,10 +164,10 @@ const projects: Project[] = [
 }
 
 .lang-dot {
-  width: 7px; height: 7px;
+  width: 6px; height: 6px;
   border-radius: 50%;
-  box-shadow: none !important;
-  opacity: 0.8;
+  background: var(--accent);
+  opacity: 0.7;
 }
 
 .project-arrow {
@@ -182,7 +185,6 @@ const projects: Project[] = [
     gap: 10px;
     padding-left: 22px;
   }
-  .project-card:hover { padding-left: 26px; }
   .project-meta { justify-content: space-between; }
   .project-lang { text-align: left; justify-content: flex-start; }
 }

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RouterLink } from 'vue-router'
-import BackgroundEffects from '../components/BackgroundEffects.vue'
 import Nav from '../components/Nav.vue'
 import FooterBar from '../components/FooterBar.vue'
 import { getAllPosts } from '../lib/posts'
@@ -25,7 +24,6 @@ function formatDate(iso: string) {
 </script>
 
 <template>
-  <BackgroundEffects />
   <Nav />
   <main>
     <section id="blog">
@@ -49,22 +47,24 @@ function formatDate(iso: string) {
         No posts yet.
       </div>
 
-      <div class="post-grid">
+      <div class="post-list">
         <RouterLink
           v-for="post in filtered"
           :key="post.slug"
           :to="`/blog/${post.slug}`"
-          class="post-card"
+          class="post-row"
         >
-          <div class="card-topic">{{ post.topic }}</div>
-          <div class="card-title">{{ post.title }}</div>
-          <div class="card-desc">{{ post.description }}</div>
-          <div class="card-footer">
+          <div class="row-meta">
             <span class="card-date">{{ formatDate(post.date) }}</span>
-            <span class="card-tags" v-if="post.tags.length">
-              <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
-            </span>
+            <span class="card-topic">{{ post.topic }}</span>
           </div>
+          <div class="row-main">
+            <div class="card-title">{{ post.title }}</div>
+            <div class="card-desc">{{ post.description }}</div>
+          </div>
+          <span class="card-tags" v-if="post.tags.length">
+            <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
+          </span>
         </RouterLink>
       </div>
     </section>
@@ -79,7 +79,7 @@ function formatDate(iso: string) {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 48px;
+  margin-bottom: 28px;
 }
 
 .topic-pill {
@@ -92,15 +92,14 @@ function formatDate(iso: string) {
   background: transparent;
   color: var(--text-dim);
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, text-shadow 0.2s, background 0.2s;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .topic-pill:hover,
 .topic-pill.active {
-  border-color: var(--cyan);
-  color: var(--cyan);
-  text-shadow: 0 0 8px var(--cyan);
-  background: rgba(0, 229, 255, 0.04);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(212, 162, 58, 0.06);
 }
 
 .empty {
@@ -111,90 +110,79 @@ function formatDate(iso: string) {
   padding: 40px 0;
 }
 
-.post-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2px;
-}
-
-.post-card {
+.post-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 40px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--border);
+}
+
+.post-row {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 22px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
   text-decoration: none;
   color: inherit;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s, background 0.2s;
 }
 
-.post-card::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: var(--cyan);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.post-card:hover {
-  border-color: oklch(85% 0.18 200 / 0.35);
-  background: rgba(0, 229, 255, 0.03);
-}
-
-.post-card:hover::before { opacity: 1; }
-
-.card-topic {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--cyan);
-}
-
-.card-title {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.25;
-}
-
-.card-desc {
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--text-dim);
-  font-weight: 300;
-  flex: 1;
-}
-
-.card-footer {
+.row-meta {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 3px;
 }
 
 .card-date {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.1em;
+  font-size: 11px;
+  letter-spacing: 0.06em;
   color: var(--text-dim);
+}
+
+.card-topic {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.row-main { min-width: 0; }
+
+.card-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.card-title::before {
+  content: '> ';
+  color: var(--accent);
+}
+
+.post-row:hover .card-title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.card-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-dim);
+  font-weight: 300;
 }
 
 .card-tags {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 220px;
 }
 
 .tag {
@@ -208,7 +196,11 @@ function formatDate(iso: string) {
 }
 
 @media (max-width: 900px) {
-  .post-grid { grid-template-columns: 1fr; }
-  .post-card { padding: 28px; }
+  .post-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .row-meta { flex-direction: row; gap: 12px; align-items: baseline; }
+  .card-tags { justify-content: flex-start; max-width: none; }
 }
 </style>

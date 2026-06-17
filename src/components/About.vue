@@ -23,9 +23,6 @@ const skills = [
     </div>
 
     <div class="about-grid">
-      <div class="about-image-block">
-        <img src="/uploads/chongq.jpg" alt="Chongqing skyline at night">
-      </div>
       <div class="about-content">
         <div class="about-label">Background notes</div>
         <p class="about-text">
@@ -55,50 +52,19 @@ const skills = [
 </template>
 
 <style scoped>
-#about { padding-bottom: 80px; }
+#about { padding-bottom: 48px; }
 
 .about-grid {
-  display: grid;
-  grid-template-columns: 0.85fr 1.15fr;
-  gap: 56px;
-  align-items: center;
-}
-
-.about-image-block {
-  position: relative;
-  overflow: hidden;
-  min-height: 460px;
-  border-left: 3px solid oklch(74% 0.14 78 / 0.42);
-}
-
-.about-image-block img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(0.18) saturate(0.82) brightness(0.64) contrast(1.08);
-  transition: filter 0.4s ease;
-}
-
-.about-image-block:hover img { filter: grayscale(0.05) saturate(0.95) brightness(0.7) contrast(1.05); }
-
-.about-image-block::after {
-  content: 'CHONGQING';
-  position: absolute;
-  left: 18px;
-  bottom: 18px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  color: rgba(238,241,237,0.72);
+  display: block;
+  max-width: 760px;
 }
 
 .about-content {
-  padding: 8px 0 8px 34px;
+  padding: 0 0 0 28px;
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 24px;
+  gap: 18px;
 }
 
 .about-label {
@@ -130,9 +96,9 @@ const skills = [
   font-size: 10px;
   letter-spacing: 0.08em;
   padding: 6px 12px;
-  border: 1px solid rgba(214,198,155,0.18);
+  border: 1px solid var(--border);
   color: var(--text-dim);
-  background: rgba(238,241,237,0.025);
+  background: rgba(230, 230, 227, 0.02);
   text-transform: uppercase;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
   display: inline-flex;
@@ -148,14 +114,12 @@ const skills = [
 }
 
 .skill-chip:hover {
-  border-color: oklch(74% 0.14 78 / 0.45);
+  border-color: var(--accent);
   color: var(--text);
-  background: rgba(214,198,155,0.04);
+  background: rgba(230, 230, 227, 0.03);
 }
 
 @media (max-width: 900px) {
-  .about-grid { grid-template-columns: 1fr; gap: 28px; }
-  .about-image-block { min-height: 280px; }
   .about-content { padding: 0 0 0 22px; }
 }
 </style>

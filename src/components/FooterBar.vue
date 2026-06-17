@@ -40,8 +40,7 @@ footer {
 
 .footer-dot {
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 8px var(--green);
+  background: var(--accent);
   animation: blink 2s ease-in-out infinite;
 }
 

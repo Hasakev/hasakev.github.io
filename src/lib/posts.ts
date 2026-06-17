@@ -1,4 +1,5 @@
 import { marked } from 'marked'
+import katex from 'katex'
 
 export interface PostMeta {
   slug: string
@@ -13,6 +14,70 @@ export interface PostMeta {
 export interface Post extends PostMeta {
   html: string
 }
+
+// Block math: $$...$$
+const blockMathExtension = {
+  name: 'blockMath',
+  level: 'block' as const,
+  start(src: string) { return src.indexOf('$$') },
+  tokenizer(src: string) {
+    const match = src.match(/^\$\$([\s\S]+?)\$\$/)
+    if (match) return { type: 'blockMath', raw: match[0], text: match[1].trim() }
+  },
+  renderer(token: { text: string }) {
+    try {
+      return `<div class="math-block">${katex.renderToString(token.text, { displayMode: true, throwOnError: false })}</div>\n`
+    } catch {
+      return `<div class="math-block math-error"><code>${token.text}</code></div>\n`
+    }
+  },
+}
+
+// Inline math: $...$
+const inlineMathExtension = {
+  name: 'inlineMath',
+  level: 'inline' as const,
+  start(src: string) { return src.indexOf('$') },
+  tokenizer(src: string) {
+    const match = src.match(/^\$([^\$\n]+?)\$/)
+    if (match) return { type: 'inlineMath', raw: match[0], text: match[1] }
+  },
+  renderer(token: { text: string }) {
+    try {
+      return `<span class="math-inline">${katex.renderToString(token.text, { displayMode: false, throwOnError: false })}</span>`
+    } catch {
+      return `<span class="math-inline math-error"><code>${token.text}</code></span>`
+    }
+  },
+}
+
+// Image renderer: support ![alt](url =WxH) for explicit sizing
+const imageRenderer = {
+  image(token: { href: string; title: string | null; text: string }) {
+    let { href, title, text } = token
+    let width = '', height = ''
+    const sizeMatch = href.match(/^(.*?)\s+=(\d*)x(\d*)$/)
+    if (sizeMatch) {
+      href = sizeMatch[1]
+      width = sizeMatch[2]
+      height = sizeMatch[3]
+    }
+    const attrs = [
+      `src="${href}"`,
+      `alt="${text}"`,
+      title ? `title="${title}"` : '',
+      width ? `width="${width}"` : '',
+      height ? `height="${height}"` : '',
+    ].filter(Boolean).join(' ')
+    return `<img ${attrs}>`
+  },
+}
+
+marked.use({
+  gfm: true,
+  extensions: [blockMathExtension, inlineMathExtension],
+  renderer: imageRenderer,
+})
 
 const modules = import.meta.glob('../posts/*.md', {
   query: '?raw',

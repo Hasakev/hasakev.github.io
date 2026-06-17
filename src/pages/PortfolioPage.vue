@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import BackgroundEffects from '../components/BackgroundEffects.vue'
 import Nav from '../components/Nav.vue'
 import Hero from '../components/Hero.vue'
 import Stats from '../components/Stats.vue'
@@ -11,7 +10,6 @@ import FooterBar from '../components/FooterBar.vue'
 </script>
 
 <template>
-  <BackgroundEffects />
   <Nav />
   <main>
     <Hero />

@@ -23,22 +23,20 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px;
-  background: linear-gradient(to bottom, rgba(11,15,18,0.92) 0%, rgba(11,15,18,0.52) 68%, transparent 100%);
-  backdrop-filter: blur(6px);
+  padding: 16px 40px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .nav-logo {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   letter-spacing: 0.15em;
-  color: var(--amber);
+  color: var(--accent);
   text-transform: uppercase;
-  text-shadow: none;
   text-decoration: none;
   border: 1px solid var(--border);
   padding: 6px 8px;
-  background: rgba(214, 198, 155, 0.04);
 }
 
 .nav-links {
@@ -59,8 +57,7 @@ nav {
 
 .nav-links a:hover,
 .nav-links a.router-link-active {
-  color: var(--amber);
-  text-shadow: none;
+  color: var(--accent);
 }
 
 @media (max-width: 900px) {

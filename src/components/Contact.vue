@@ -57,7 +57,7 @@ function submit() {
             <textarea v-model="form.message" rows="4" placeholder="What's on your mind?" required></textarea>
           </div>
           <button type="submit" class="btn-primary" :disabled="status === 'sending'">
-            {{ status === 'sending' ? 'Opening...' : 'Send Message' }}
+            {{ status === 'sending' ? 'opening...' : 'send message' }}
           </button>
           <p v-if="status === 'success'" class="form-msg success">Mail app opened.</p>
           <p v-if="status === 'error'" class="form-msg error">Something went wrong. Try emailing directly.</p>
@@ -84,27 +84,21 @@ function submit() {
           </a>
         </div>
       </div>
-
-      <div class="city-image-contact">
-        <img src="/uploads/chongqing_night.jpg" alt="Chongqing bridge at night">
-      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-#contact { padding-bottom: 160px; }
+#contact { padding-bottom: 96px; }
 
 .contact-inner {
-  display: grid;
-  grid-template-columns: 1.08fr 0.92fr;
-  gap: 56px;
-  align-items: stretch;
+  display: block;
+  max-width: 680px;
 }
 
 .contact-card {
-  padding: 0 0 0 30px;
-  border-left: 2px solid oklch(74% 0.14 78 / 0.38);
+  padding: 0 0 0 28px;
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -118,8 +112,8 @@ function submit() {
   line-height: 1.1;
 }
 
-.accent-cyan { color: var(--amber); }
-.accent-magenta { color: var(--cyan); }
+.accent-cyan { color: var(--accent); }
+.accent-magenta { color: var(--text); }
 
 .contact-sub {
   font-size: 15px;
@@ -151,12 +145,12 @@ function submit() {
 
 .field input,
 .field textarea {
-  background: rgba(238, 241, 237, 0.025);
-  border: 1px solid rgba(214,198,155,0.18);
+  background: rgba(230, 230, 227, 0.02);
+  border: 1px solid var(--border);
   color: var(--text);
   font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   outline: none;
   resize: vertical;
   transition: border-color 0.2s;
@@ -164,7 +158,7 @@ function submit() {
 
 .field input:focus,
 .field textarea:focus {
-  border-color: oklch(74% 0.14 78 / 0.5);
+  border-color: var(--accent);
 }
 
 .field input::placeholder,
@@ -204,7 +198,7 @@ function submit() {
   color: var(--text-dim);
   font-size: 14px;
   padding: 16px 20px;
-  border: 1px solid rgba(214,198,155,0.18);
+  border: 1px solid var(--border);
   transition: border-color 0.2s, color 0.2s, background 0.2s, transform 0.2s;
   position: relative;
   overflow: hidden;
@@ -220,7 +214,7 @@ function submit() {
   transition: opacity 0.2s;
 }
 
-.contact-link:hover { border-color: oklch(74% 0.14 78 / 0.45); color: var(--text); background: rgba(214,198,155,0.035); transform: translateX(3px); }
+.contact-link:hover { border-color: var(--accent); color: var(--text); }
 .contact-link:hover::before { opacity: 1; }
 
 .contact-link-icon { width: 20px; height: 20px; opacity: 0.7; flex-shrink: 0; }
@@ -236,32 +230,7 @@ function submit() {
 }
 .contact-link-val { font-size: 13px; color: var(--text); }
 
-.city-image-contact {
-  position: relative;
-  overflow: hidden;
-  min-height: 400px;
-}
-
-.city-image-contact img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  filter: grayscale(0.2) saturate(0.82) brightness(0.58) contrast(1.08);
-  transition: transform 0.6s ease;
-}
-
-.city-image-contact:hover img { transform: scale(1.03); }
-
-.city-image-contact::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(4,6,13,0.8) 0%, transparent 50%);
-}
-
 @media (max-width: 900px) {
-  .contact-inner { grid-template-columns: 1fr; gap: 30px; }
   .contact-card { padding: 0 0 0 22px; }
-  .city-image-contact { min-height: 280px; }
 }
 </style>

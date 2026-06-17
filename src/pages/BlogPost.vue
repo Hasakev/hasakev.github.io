@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import 'katex/dist/katex.min.css'
 import { computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import BackgroundEffects from '../components/BackgroundEffects.vue'
 import Nav from '../components/Nav.vue'
 import FooterBar from '../components/FooterBar.vue'
 import { getPost } from '../lib/posts'
@@ -20,7 +20,6 @@ function formatDate(iso: string) {
 </script>
 
 <template>
-  <BackgroundEffects />
   <Nav />
   <main>
     <article class="post-article">
@@ -87,12 +86,12 @@ function formatDate(iso: string) {
 }
 
 .breadcrumb-link {
-  color: var(--cyan);
+  color: var(--accent);
   text-decoration: none;
-  transition: text-shadow 0.2s;
+  transition: color 0.2s;
 }
 
-.breadcrumb-link:hover { text-shadow: 0 0 10px var(--cyan); }
+.breadcrumb-link:hover { color: var(--text); }
 
 .breadcrumb-sep { color: var(--text-dim); opacity: 0.4; }
 
@@ -109,10 +108,10 @@ function formatDate(iso: string) {
 
 .post-title {
   font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(32px, 5vw, 56px);
-  font-weight: 800;
+  font-size: clamp(30px, 5vw, 50px);
+  font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.05;
+  line-height: 1.08;
   color: var(--text);
   margin-bottom: 24px;
 }
@@ -176,32 +175,32 @@ function formatDate(iso: string) {
 :deep(.post-body h1) { font-size: 2rem; }
 :deep(.post-body h2) { font-size: 1.5rem; }
 :deep(.post-body h3) { font-size: 1.2rem; }
-:deep(.post-body h4) { font-size: 1rem; color: var(--cyan); }
+:deep(.post-body h4) { font-size: 1rem; color: var(--accent); }
 
 :deep(.post-body p) { margin-bottom: 1.4rem; }
 
 :deep(.post-body a) {
-  color: var(--cyan);
+  color: var(--accent);
   text-decoration: none;
-  border-bottom: 1px solid oklch(85% 0.18 200 / 0.3);
-  transition: border-color 0.2s, text-shadow 0.2s;
+  border-bottom: 1px solid rgba(212, 162, 58, 0.35);
+  transition: border-color 0.2s, color 0.2s;
 }
 :deep(.post-body a:hover) {
-  border-color: var(--cyan);
-  text-shadow: 0 0 8px var(--cyan);
+  border-color: var(--accent);
+  color: var(--text);
 }
 
 :deep(.post-body strong) { color: var(--text); font-weight: 600; }
-:deep(.post-body em) { color: var(--amber); font-style: normal; }
+:deep(.post-body em) { color: var(--accent); font-style: normal; }
 
 :deep(.post-body code) {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.85em;
-  background: rgba(0, 229, 255, 0.07);
+  background: var(--bg2);
   border: 1px solid var(--border);
   padding: 2px 7px;
   border-radius: 2px;
-  color: var(--cyan);
+  color: var(--accent);
 }
 
 :deep(.post-body pre) {
@@ -210,7 +209,7 @@ function formatDate(iso: string) {
   padding: 24px;
   overflow-x: auto;
   margin: 1.8rem 0;
-  border-left: 3px solid var(--cyan);
+  border-left: 2px solid var(--accent);
 }
 
 :deep(.post-body pre code) {
@@ -274,6 +273,83 @@ function formatDate(iso: string) {
   margin: 2.5rem 0;
 }
 
+/* Strikethrough */
+:deep(.post-body del) {
+  color: var(--text-dim);
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+/* Task lists (GFM checkboxes) */
+:deep(.post-body ul:has(li input[type="checkbox"])) {
+  list-style: none;
+}
+:deep(.post-body ul li:has(input[type="checkbox"])) {
+  padding-left: 28px;
+}
+:deep(.post-body ul li:has(input[type="checkbox"])::before) {
+  content: none;
+}
+:deep(.post-body input[type="checkbox"]) {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--cyan);
+  border-radius: 2px;
+  background: transparent;
+  margin-right: 8px;
+  margin-left: -24px;
+  position: relative;
+  top: 2px;
+  cursor: default;
+  flex-shrink: 0;
+  display: inline-block;
+}
+:deep(.post-body input[type="checkbox"]:checked) {
+  background: rgba(212, 162, 58, 0.2);
+}
+:deep(.post-body input[type="checkbox"]:checked::after) {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  font-size: 11px;
+  color: var(--cyan);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Images */
+:deep(.post-body img) {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: block;
+  margin: 1.8rem auto;
+}
+
+/* Math blocks */
+:deep(.post-body .math-block) {
+  overflow-x: auto;
+  padding: 20px 24px;
+  margin: 1.8rem 0;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--cyan);
+  text-align: center;
+}
+:deep(.post-body .math-inline) {
+  font-size: 0.95em;
+}
+:deep(.post-body .math-error code) {
+  color: var(--amber);
+  font-size: 0.85em;
+}
+:deep(.post-body .katex) {
+  color: var(--text);
+}
+
 :deep(.post-body table) {
   width: 100%;
   border-collapse: collapse;
@@ -293,8 +369,8 @@ function formatDate(iso: string) {
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--cyan);
-  background: rgba(0, 229, 255, 0.05);
+  color: var(--accent);
+  background: rgba(212, 162, 58, 0.06);
 }
 
 @media (max-width: 600px) {

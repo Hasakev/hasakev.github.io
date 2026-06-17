@@ -26,20 +26,22 @@ onUnmounted(() => {
 
 <template>
   <div class="stats-wrapper">
-    <div class="stats-row" aria-label="profile notes">
-      <div class="stat-block">
-        <span class="stat-label">Current desk</span>
-        <a href="https://epecgroup.com.au" target="_blank" rel="noopener" class="stat-num">EPEC</a>        
-      </div>
-      <div class="stat-block">
-        <span class="stat-label">Main tools</span>
-        <span class="stat-num">Python · PLEXOS · My Brain</span>
-      </div>
-      <div class="stat-block">
-        <span class="stat-label">Working from</span>
-        <span class="stat-num">UTC+10</span>
-        <span class="stat-clock" aria-label="Current time in Brisbane">{{ brisbaneTime }}</span>
-      </div>
+    <div class="status-bar" aria-label="profile status">
+      <span class="seg">
+        <span class="k">desk</span>
+        <a href="https://epecgroup.com.au" target="_blank" rel="noopener" class="v link">EPEC</a>
+      </span>
+      <span class="sep">·</span>
+      <span class="seg">
+        <span class="k">tools</span>
+        <span class="v">Python · PLEXOS · brain</span>
+      </span>
+      <span class="sep">·</span>
+      <span class="seg">
+        <span class="k">tz</span>
+        <span class="v">UTC+10</span>
+        <span class="clock" aria-label="Current time in Brisbane">{{ brisbaneTime }}</span>
+      </span>
     </div>
   </div>
 </template>
@@ -51,61 +53,44 @@ onUnmounted(() => {
   padding: 0 40px;
 }
 
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-  padding: 20px 0;
+.status-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 14px;
+  padding: 12px 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-}
-
-.stat-block {
-  text-align: left;
-  padding-left: 18px;
-  border-left: 2px solid oklch(74% 0.14 78 / 0.45);
-}
-
-.stat-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(17px, 2vw, 22px);
-  font-weight: 500;
-  color: var(--text);
-  line-height: 1.2;
-  display: block;
-  margin-top: 7px;
-}
-
-.stat-num[href] {
-  text-decoration: none;
-}
-
-.stat-num[href]:hover {
-  text-decoration: none;
-  color: var(--amber);
-}
-
-.stat-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: 0.13em;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  display: block;
-}
-
-.stat-clock {
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
-  letter-spacing: 0.08em;
-  color: var(--amber);
-  display: inline-block;
-  margin-top: 8px;
+}
+
+.seg { display: inline-flex; align-items: baseline; gap: 8px; }
+
+.k {
+  color: var(--text-dim);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.k::after { content: ':'; color: var(--text-dim); }
+
+.v { color: var(--text); }
+
+.v.link { text-decoration: none; }
+.v.link:hover { color: var(--accent); }
+
+.sep { color: var(--text-dim); opacity: 0.5; }
+
+.clock {
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
 }
 
 @media (max-width: 600px) {
-  .stats-row { grid-template-columns: 1fr; gap: 18px; }
   .stats-wrapper { padding: 0 24px; }
+  .sep { display: none; }
+  .seg { width: 100%; }
 }
 </style>

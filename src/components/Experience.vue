@@ -73,7 +73,7 @@ const items: TimelineItem[] = [
 </template>
 
 <style scoped>
-#experience { padding-bottom: 80px; }
+#experience { padding-bottom: 48px; }
 
 .timeline {
   display: flex;
@@ -87,15 +87,14 @@ const items: TimelineItem[] = [
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 1px;
-  background: linear-gradient(to bottom, var(--cyan), oklch(60% 0.25 350), transparent);
-  opacity: 0.3;
+  background: var(--border);
 }
 
 .timeline-item {
   display: grid;
   grid-template-columns: 180px 1fr;
   gap: 0;
-  padding: 40px 0;
+  padding: 28px 0;
   border-bottom: 1px solid var(--border);
   position: relative;
 }
@@ -103,11 +102,10 @@ const items: TimelineItem[] = [
 .timeline-item::before {
   content: '';
   position: absolute;
-  left: -4px; top: 48px;
-  width: 9px; height: 9px;
+  left: -4px; top: 36px;
+  width: 7px; height: 7px;
   border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan);
+  background: var(--accent);
 }
 
 .timeline-date {
@@ -126,8 +124,8 @@ const items: TimelineItem[] = [
 
 .timeline-role {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
   margin-bottom: 6px;
   color: var(--text);
 }
