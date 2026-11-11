@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hasakev</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #0c0c0c; color: #cfcfcf; font: 15px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+  main { max-width: 72ch; padding: 2rem 1rem; white-space: pre-wrap; word-break: break-word; }
+  a { color: inherit; }
+  .p { color: #7a7a7a; }
+  .line { display: flex; }
+  input::placeholder { color: #3a3a3a; }
+  input { flex: 1; background: none; border: 0; outline: 0; color: inherit; font: inherit; padding: 0; caret-color: #cfcfcf; }
+</style>
+</head>
+<body>
+<main><div id="out" aria-live="polite"></div></main>
+<script>
+const FS = {
+  'about.txt': 'kevin luo. electricity market modeller.\na role with different hats: economist, software developer, problem solver.\nnot building anything on the side right now.',
+  'links.txt': 'github    https://github.com/Hasakev\nlinkedin  https://www.linkedin.com/in/hasakev/\nemail     mailto:dev.spam.kev@gmail.com',
+  '.plan': 'nothing yet. that is the plan.',
+  'archive/': {
+    'spam-detection-api.txt': 'spam detection service on AWS. flask, docker, terraform, celery.\nhttps://github.com/Hasakev',
+    'tower-defence.txt': 'tower defence game built with 30 students. java, libgdx.\nhttps://github.com/UQcsse3200/2023-studio-3',
+    'old-website.txt': 'a flashier version of this site. vue, vite.\nretired for being too much.',
+  },
+};
+const out = document.getElementById('out');
+const hist = [];
+let cwd = [], hi = 0;
+
+const esc = s => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+const link = s => esc(s).replace(/(https:\/\/\S+|mailto:(\S+))/g, (u, _, m) => `<a href="${u}" target="_blank" rel="noopener">${m || u}</a>`);
+const prompt = () => `guest@hasakev:~${cwd.map(d => '/' + d.slice(0, -1)).join('')}$ `;
+const dir = () => cwd.reduce((d, k) => d[k], FS);
+
+function resolve(path = '') {
+  let parts = path.startsWith('~') ? [] : [...cwd];
+  for (const seg of path.replace(/^~\/?/, '').split('/').filter(Boolean)) {
+    if (seg === '.') continue;
+    if (seg === '..') { parts.pop(); continue; }
+    const node = parts.reduce((d, k) => d[k], FS);
+    if (typeof node !== 'object') return null;
+    const key = seg + '/' in node ? seg + '/' : seg in node ? seg : null;
+    if (!key) return null;
+    parts.push(key);
+  }
+  return parts;
+}
+
+const CMDS = {
+  help: () => 'ls [-a]  cat <file>  cd <dir>  pwd  whoami  date  history  clear',
+  whoami: () => 'guest. you are looking at kevin luo\'s home directory.',
+  pwd: () => '/home/guest' + cwd.map(d => '/' + d.slice(0, -1)).join(''),
+  date: () => new Date().toLocaleString('en-AU', { timeZone: 'Australia/Brisbane', dateStyle: 'short', timeStyle: 'medium' }) + ' AEST',
+  history: () => hist.map((h, i) => `${String(i + 1).padStart(4)}  ${h}`).join('\n'),
+  clear: () => { out.innerHTML = ''; },
+  ls: args => {
+    const all = args.includes('-a');
+    const p = resolve(args.find(a => a[0] !== '-'));
+    const node = p && p.reduce((d, k) => d[k], FS);
+    if (typeof node !== 'object') return 'ls: no such directory';
+    return Object.keys(node).filter(k => all || k[0] !== '.').join('  ');
+  },
+  cat: ([f]) => {
+    const p = f && resolve(f);
+    const node = p && p.reduce((d, k) => d[k], FS);
+    if (typeof node === 'string') return node;
+    return node ? `cat: ${f}: is a directory` : `cat: ${f || ''}: no such file`;
+  },
+  cd: ([d]) => {
+    const p = resolve(d || '~');
+    if (!p || typeof p.reduce((n, k) => n[k], FS) !== 'object') return `cd: ${d}: no such directory`;
+    cwd = p;
+  },
+  sudo: () => 'nice try.',
+};
+
+function print(html) { out.insertAdjacentHTML('beforeend', html + '\n'); }
+
+function run(line) {
+  print(`<span class="p">${esc(prompt())}</span>${esc(line)}`);
+  if (!line.trim()) return;
+  hist.push(line);
+  const [cmd, ...args] = line.trim().split(/\s+/);
+  const res = CMDS[cmd] ? CMDS[cmd](args) : `${cmd}: command not found. try 'help'`;
+  if (res) print(link(res));
+}
+
+function complete(input) {
+  const words = input.value.split(' ');
+  const last = words.pop();
+  const pool = words.length ? Object.keys(dir()) : Object.keys(CMDS).filter(c => c !== 'sudo');
+  const hits = pool.filter(k => k.startsWith(last));
+  if (hits.length === 1) input.value = [...words, hits[0]].join(' ');
+  else if (hits.length > 1) { print(`<span class="p">${esc(prompt())}</span>${esc(input.value)}\n${hits.join('  ')}`); }
+}
+
+function newLine() {
+  const line = document.createElement('div');
+  line.className = 'line';
+  line.innerHTML = `<span class="p">${esc(prompt())}</span><input aria-label="terminal input" autocomplete="off" autocapitalize="off" spellcheck="false"${hist.length ? '' : ' placeholder="help"'}>`;
+  out.parentNode.append(line);
+  const input = line.querySelector('input');
+  input.focus();
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { line.remove(); run(input.value); hi = hist.length; newLine(); }
+    else if (e.key === 'Tab') { e.preventDefault(); complete(input); }
+    else if (e.key === 'ArrowUp' && hi > 0) { input.value = hist[--hi]; e.preventDefault(); }
+    else if (e.key === 'ArrowDown') { input.value = hist[++hi] ?? ''; hi = Math.min(hi, hist.length); }
+    else if (e.key === 'l' && e.ctrlKey) { e.preventDefault(); CMDS.clear(); }
+  });
+  scrollTo(0, document.body.scrollHeight);
+}
+
+document.addEventListener('click', () => { if (!getSelection().toString()) document.querySelector('input')?.focus(); });
+newLine();
+</script>
+</body>
+</html>
