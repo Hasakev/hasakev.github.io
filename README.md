@@ -1,16 +1,3 @@
-# Portfolio
+# hasakev.github.io
 
-Frontend-only Vue 3 site deployed to GitHub Pages.
-
-## Dev
-
-```bash
-npm install
-npm run dev
-```
-
-## Build
-
-```bash
-npm run build
-```
+One static `index.html`: a tiny terminal. No build step; open the file to preview.

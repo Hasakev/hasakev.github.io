@@ -1,4 +1,4 @@
-name: Build and deploy site
+name: Deploy site
 
 on:
   push:
@@ -14,29 +14,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build site
-        run: npm run build
-
-      - name: Deploy dist to site branch
+      - name: Deploy static files to site branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./
+          exclude_assets: '.github,README.md,.gitignore'
           publish_branch: site
           force_orphan: true
